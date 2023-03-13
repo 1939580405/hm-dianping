@@ -42,6 +42,18 @@ public class CacheClient {
         stringRedisTemplate.opsForValue().set(key, JSONUtil.toJsonStr(redisData));
     }
 
+    /**
+     * 利用存空值解决缓存穿透
+     * @param keyPrefix
+     * @param id
+     * @param type
+     * @param dbFallback 这个参数传进来的是一个方法
+     * @param time
+     * @param unit
+     * @return
+     * @param <R>
+     * @param <ID>
+     */
     public <R,ID> R queryWithPassThrough(
             String keyPrefix, ID id, Class<R> type, Function<ID, R> dbFallback, Long time, TimeUnit unit){
         String key = keyPrefix + id;
