@@ -44,8 +44,9 @@ public class SimpleRedisLock implements ILock {
                 UNLOCK_SCRIPT,
                 Collections.singletonList(KEY_PREFIX + name),
                 ID_PREFIX + Thread.currentThread().getId());
+        stringRedisTemplate.delete(KEY_PREFIX + name);
     }
-    /*@Override
+   /* @Override
     public void unlock() {
         // 获取线程标示
         String threadId = ID_PREFIX + Thread.currentThread().getId();
