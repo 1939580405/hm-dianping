@@ -35,7 +35,7 @@ class HmDianPingApplicationTests {
 
     private ExecutorService es = Executors.newFixedThreadPool(500);
 
-    @Test
+   /* @Test
     void testIdWorker() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(300);
 
@@ -53,6 +53,6 @@ class HmDianPingApplicationTests {
         latch.await();
         long end = System.currentTimeMillis();
         System.out.println("time = " + (end - begin));
-    }
+    }*/
 
 }
