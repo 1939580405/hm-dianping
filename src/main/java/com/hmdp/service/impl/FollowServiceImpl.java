@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmdp.dto.Result;
 import com.hmdp.dto.UserDTO;
+import com.hmdp.entity.Blog;
 import com.hmdp.entity.Follow;
 import com.hmdp.mapper.FollowMapper;
 import com.hmdp.service.IFollowService;
@@ -18,6 +19,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.hmdp.utils.RedisConstants.FEED_KEY;
 
 
 @Service
@@ -71,18 +74,22 @@ public class FollowServiceImpl extends ServiceImpl<FollowMapper, Follow> impleme
         return Result.ok(count > 0);
     }
 
-   /* @Override
+   @Override
     public Result followCommons(Long id) {
         // 1.获取当前用户
         Long userId = UserHolder.getUser().getId();
         String key = "follows:" + userId;
         // 2.求交集
         String key2 = "follows:" + id;
-        Set<String> intersect = stringRedisTemplate.opsForSet().intersect(key, key2);
+       /**
+        * 这里是取两个键对应的set的交集
+        */
+       Set<String> intersect = stringRedisTemplate.opsForSet().intersect(key, key2);
         if (intersect == null || intersect.isEmpty()) {
             // 无交集
             return Result.ok(Collections.emptyList());
         }
+        //TODO 这里应该是将set集合转换成list集合的快速方法
         // 3.解析id集合
         List<Long> ids = intersect.stream().map(Long::valueOf).collect(Collectors.toList());
         // 4.查询用户
@@ -91,5 +98,5 @@ public class FollowServiceImpl extends ServiceImpl<FollowMapper, Follow> impleme
                 .map(user -> BeanUtil.copyProperties(user, UserDTO.class))
                 .collect(Collectors.toList());
         return Result.ok(users);
-    }*/
+    }
 }

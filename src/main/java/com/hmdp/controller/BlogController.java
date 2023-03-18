@@ -32,19 +32,14 @@ public class BlogController {
 
     /***
      * 该方法是用来接收用户发送的探店笔记Blog类型
-     * @param blog
+     * @param blog 从前端发过来的笔记中是没有笔记发布者的用户id的
      * @return
      */
     @PostMapping
     public Result saveBlog(@RequestBody Blog blog) {
-        // 获取登录用户，用户发过来的Blog中没有用户id，所以要从ThreadLocal中获取用户id
-        UserDTO user = UserHolder.getUser();
-        blog.setUserId(user.getId());
-        // 保存探店博文
-        blogService.save(blog);
-        // 返回id
-        return Result.ok(blog.getId());
+        return blogService.saveBlog(blog);
     }
+
 
     /***
      * 无论是从初始界面的笔记点赞，还是进入笔记内部的点赞，都是进到这里，目的是为了更新点赞数
@@ -98,6 +93,39 @@ public class BlogController {
     @GetMapping("/{id}")
     public Result queryBlogById(@PathVariable("id") Long id) {
         return blogService.queryBlogById(id);
+    }
+
+    // BlogController  根据id查询博主的探店笔记
+
+    /***
+     * 根据id查询博主的探店笔记
+     * @param current
+     * @param id
+     * @return
+     */
+    @GetMapping("/of/user")
+    public Result queryBlogByUserId(
+            @RequestParam(value = "current", defaultValue = "1") Integer current,
+            @RequestParam("id") Long id) {
+        // 根据用户查询
+        Page<Blog> page = blogService.query()
+                .eq("user_id", id).page(new Page<>(current, SystemConstants.MAX_PAGE_SIZE));
+        // 获取当前页数据
+        List<Blog> records = page.getRecords();
+        return Result.ok(records);
+    }
+
+
+    /***
+     * 用户发来查看自己关注对象的笔记的请求
+     * @param max 上一次访问的最后一个笔记的score，就是时间。作为这一次查询的评判标准
+     * @param offset 初始偏移量
+     * @return
+     */
+    @GetMapping("/of/follow")
+    public Result queryBlogOfFollow(
+            @RequestParam("lastId") Long max, @RequestParam(value = "offset", defaultValue = "0") Integer offset){
+        return blogService.queryBlogOfFollow(max, offset);
     }
 
 
