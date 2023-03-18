@@ -29,12 +29,15 @@ public class BlogController {
 
     @Resource
     private IBlogService blogService;
-    @Resource
-    private IUserService userService;
 
+    /***
+     * 该方法是用来接收用户发送的探店笔记Blog类型
+     * @param blog
+     * @return
+     */
     @PostMapping
     public Result saveBlog(@RequestBody Blog blog) {
-        // 获取登录用户
+        // 获取登录用户，用户发过来的Blog中没有用户id，所以要从ThreadLocal中获取用户id
         UserDTO user = UserHolder.getUser();
         blog.setUserId(user.getId());
         // 保存探店博文
@@ -43,12 +46,24 @@ public class BlogController {
         return Result.ok(blog.getId());
     }
 
+    /***
+     * 无论是从初始界面的笔记点赞，还是进入笔记内部的点赞，都是进到这里，目的是为了更新点赞数
+     * @param id 笔记的id号
+     * @return
+     */
     @PutMapping("/like/{id}")
     public Result likeBlog(@PathVariable("id") Long id) {
-        // 修改点赞数量
-        blogService.update()
-                .setSql("liked = liked + 1").eq("id", id).update();
-        return Result.ok();
+        return blogService.likeBlog(id);
+    }
+
+    /***
+     * 用户在前端点赞的时候同时发过来的请求，目的是为了点赞用户的头像加到点赞列表中
+     * @param id
+     * @return
+     */
+    @GetMapping("/likes/{id}")
+    public Result queryBlogLikes(@PathVariable("id") Long id) {
+        return blogService.queryBlogLikes(id);
     }
 
     @GetMapping("/of/me")
@@ -63,21 +78,27 @@ public class BlogController {
         return Result.ok(records);
     }
 
+    /**
+     * 根据页面热门查笔记
+     * 从数据库中查出来的笔记中带有发表它的用户的id，需要通过userid去查用户表，将用户头像和id给查出来，并且放到Blog中
+     * @param current
+     * @return
+     */
     @GetMapping("/hot")
     public Result queryHotBlog(@RequestParam(value = "current", defaultValue = "1") Integer current) {
-        // 根据用户查询
-        Page<Blog> page = blogService.query()
-                .orderByDesc("liked")
-                .page(new Page<>(current, SystemConstants.MAX_PAGE_SIZE));
-        // 获取当前页数据
-        List<Blog> records = page.getRecords();
-        // 查询用户
-        records.forEach(blog ->{
-            Long userId = blog.getUserId();
-            User user = userService.getById(userId);
-            blog.setName(user.getNickName());
-            blog.setIcon(user.getIcon());
-        });
-        return Result.ok(records);
+        return blogService.queryHotBlog(current);
     }
+
+    /***
+     * 根据id查笔记
+     * 从数据库中查出来的笔记中带有发表它的用户的id，需要通过userid去查用户表，将用户头像和id给查出来，并且放到Blog中
+     * @param id 笔记的id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public Result queryBlogById(@PathVariable("id") Long id) {
+        return blogService.queryBlogById(id);
+    }
+
+
 }
