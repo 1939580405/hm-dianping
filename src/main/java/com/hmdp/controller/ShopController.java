@@ -20,7 +20,7 @@ public class ShopController {
     public IShopService shopService;
 
     /**
-     * 根据id查询商铺信息
+     * 根据id查询商铺信息，先查缓存，再查数据库
      * @param id 商铺id
      * @return 商铺详情数据
      */

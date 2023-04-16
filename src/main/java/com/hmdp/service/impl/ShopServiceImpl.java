@@ -204,14 +204,12 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
         if(StrUtil.isNotBlank(shopJson)){
             //3.若在缓存中存在，直接返回
             return JSONUtil.toBean(shopJson,Shop.class);
-
         }
         //判断命中的是否为空字符串
         if(shopJson == ""){
             //返回一个错误信息
             return null;
         }
-
         //4.不存在，根据id查询数据库
         Shop shop = getById(id);
         //5.不存在，返回错误
@@ -224,7 +222,6 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
         stringRedisTemplate.opsForValue().set(key, JSONUtil.toJsonStr(shop), CACHE_SHOP_TTL, TimeUnit.MINUTES);
         //7.返回
         return shop;
-
     }
 
     /***

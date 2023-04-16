@@ -15,6 +15,10 @@ public class MvcConfig implements WebMvcConfigurer {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
+    /**
+     * 这里设置了两个拦截器，刷新拦截器在前，登录校验拦截器在后
+     * @param registry
+     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // 登录拦截器
@@ -29,6 +33,7 @@ public class MvcConfig implements WebMvcConfigurer {
                         "/user/login"
                 ).order(1);
         //token刷新的拦截器
+
         registry.addInterceptor(new RefreshTokenInterceptor(stringRedisTemplate)).addPathPatterns("/**").order(0);
     }
 }

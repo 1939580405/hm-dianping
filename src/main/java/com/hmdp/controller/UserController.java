@@ -28,8 +28,8 @@ public class UserController {
     @Resource
     private IUserInfoService userInfoService;
 
-    /**
-     * 发送手机验证码
+    /** 从前端过来的请求中带有的是手机号码
+     *
      */
     @PostMapping("code")
     public Result sendCode(@RequestParam("phone") String phone, HttpSession session) {
@@ -38,6 +38,7 @@ public class UserController {
 
     /**
      * 登录功能
+     * 用户在输入验证码之后点击登录按钮会发送的请求，手机号码和验证码等重要信息都在请求体里
      * @param loginForm 登录参数，包含手机号、验证码；或者手机号、密码
      */
     @PostMapping("/login")

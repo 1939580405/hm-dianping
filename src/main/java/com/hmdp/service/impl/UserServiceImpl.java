@@ -46,7 +46,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
-
+    /***
+     * 生成验证码的方法，会将手机号码加上前缀作为key，验证码本身作为value保存到redis中。
+     * 并且将验证码打印到控制台
+     * @param phone
+     * @param session
+     * @return
+     */
     @Override
     public Result sendCode(String phone, HttpSession session) {
         //1. 校验手机号,正则表达式工具类
@@ -103,11 +109,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         //TODO 7.2 将User对象转换成HashMap存储
         UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
         //Map<String, Object> map = BeanUtil.beanToMap(userDTO);
+        /***
+         * 因为redis中只能存储字符串，而用户的id是long类型，是数据库里自增长的，所以在userDTO转成map的时候，
+         * 要对其进行自定义一下
+         */
         Map<String, Object> map = BeanUtil.beanToMap(userDTO, new HashMap<>(),
                 CopyOptions.create()
                         .setIgnoreNullValue(true)
                         .setFieldValueEditor((fieldName, fieldValue) -> fieldValue.toString()));
         //TODO 7.3 存储
+        /***
+         * 在redis里，用户是以hash的形式存在Redis中，外边的key是token，里面也会是hash结构
+         */
         String tokenKey = LOGIN_USER_KEY + token;
         //这里放进来的map的所有键和值的类型应该都要是String
         stringRedisTemplate.opsForHash().putAll(tokenKey,map);

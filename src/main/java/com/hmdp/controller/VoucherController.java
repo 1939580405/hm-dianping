@@ -18,7 +18,7 @@ public class VoucherController {
 
     /**
      * 新增普通券
-     * @param voucher 优惠券信息
+     * @param voucher 优惠券信息,在请求体中是以json串的形式发过来的
      * @return 优惠券id
      */
     @PostMapping

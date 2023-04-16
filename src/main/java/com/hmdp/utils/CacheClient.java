@@ -64,12 +64,11 @@ public class CacheClient {
             // 3.存在，直接返回
             return JSONUtil.toBean(json, type);
         }
-        // 判断命中的是否是空值
+        // 判断命中的是否是空值，如果是null，那就要去查数据库，如果不是null，那一定是空串
         if (json != null) {
-            // 返回一个错误信息
+            // 如果查到的是空串，就给前端返回一个null
             return null;
         }
-
         // 4.不存在，根据id查询数据库
         R r = dbFallback.apply(id);
         // 5.不存在，返回错误
@@ -139,12 +138,11 @@ public class CacheClient {
             // 3.存在，直接返回
             return JSONUtil.toBean(shopJson, type);
         }
-        // 判断命中的是否是空值
+        // 判断命中的是否是空值，如果是null，那就要去查数据库，如果不是null，那一定是空串
         if (shopJson != null) {
-            // 返回一个错误信息
+            // 如果查到的是空串，就给前端返回一个null
             return null;
         }
-
         // 4.实现缓存重建
         // 4.1.获取互斥锁
         String lockKey = LOCK_SHOP_KEY + id;

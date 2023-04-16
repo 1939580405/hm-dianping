@@ -12,6 +12,10 @@ import javax.servlet.http.HttpSession;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+/***
+ * 登录拦截器
+ * 判断用户是否处于登录状态
+ */
 public class LoginInterceptor implements HandlerInterceptor {
     private StringRedisTemplate stringRedisTemplate;
 
