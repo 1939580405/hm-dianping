@@ -164,7 +164,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         // 1.获取登录用户
         UserDTO user = UserHolder.getUser();
         blog.setUserId(user.getId());
-        // 2.保存探店笔记
+        // 2.保存探店笔记,这里用的是mybatis-plus的Iservice中的方法
         boolean isSuccess = save(blog);
         if(!isSuccess){
             return Result.fail("新增笔记失败!");
@@ -176,6 +176,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
             // 4.1.获取粉丝id
             Long userId = follow.getUserId();
             // 4.2.推送
+            //粉丝的邮箱是SortedSet类型的，可以用前缀加上用户id组成的，里面的值是笔记的id，grade是系统时间
             String key = FEED_KEY + userId;
             stringRedisTemplate.opsForZSet().add(key, blog.getId().toString(), System.currentTimeMillis());
         }

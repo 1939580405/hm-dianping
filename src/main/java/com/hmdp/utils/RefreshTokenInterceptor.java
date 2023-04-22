@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
+//import static 导入某个类下的所有静态变量或者方法
 import static com.hmdp.utils.RedisConstants.LOGIN_USER_KEY;
 import static com.hmdp.utils.RedisConstants.LOGIN_USER_TTL;
 
@@ -34,13 +34,15 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
             return true;
         }
         // 2.基于TOKEN获取redis中的用户
+        //public static final String LOGIN_USER_KEY = "login:token:";
         String key  = LOGIN_USER_KEY + token;
+        //获取hash，获取出来的是Map
         Map<Object, Object> userMap = stringRedisTemplate.opsForHash().entries(key);
         // 3.判断用户是否存在
         if (userMap.isEmpty()) {
             return true;
         }
-        // 5.将查询到的hash数据转为UserDTO
+        // 5.将查询到的hash数据转为UserDTO，使用UserDTO是用来屏蔽一些私密信息的
         UserDTO userDTO = BeanUtil.fillBeanWithMap(userMap, new UserDTO(), false);
         // 6.存在，保存用户信息到 ThreadLocal
         UserHolder.saveUser(userDTO);
@@ -52,17 +54,11 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
 
     /**
      * 该方法在控制器中的方法结束后执行，用于释放每个线程到threadlocal中的存到对象
-     * @param request current HTTP request
-     * @param response current HTTP response
-     * @param handler the handler (or {@link HandlerMethod}) that started asynchronous
-     * execution, for type and/or instance examination
-     * @param ex any exception thrown on handler execution, if any; this does not
-     * include exceptions that have been handled through an exception resolver
      * @throws Exception
      */
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        // 移除用户
+        // 移除用户，防止OOM
         UserHolder.removeUser();
     }
 }

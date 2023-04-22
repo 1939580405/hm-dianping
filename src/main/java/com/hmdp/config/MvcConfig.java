@@ -11,7 +11,9 @@ import javax.annotation.Resource;
 
 @Configuration
 public class MvcConfig implements WebMvcConfigurer {
-
+    //RedisTemplate的以字符串为中心的扩展。
+    // 由于大多数针对Redis的操作都是基于字符串的，所以这个类提供了一个专用类，
+    // 可以最大限度地减少其更通用模板的配置，尤其是在序列化程序方面。
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
